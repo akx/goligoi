@@ -66,12 +66,13 @@ const resultDiv = () => {
   });
   if (currentTotal === 0) return;
   const percentageString =
-      (purchaseTotal > 0 ? (currentTotal / purchaseTotal).toLocaleString('en', {
-        style: 'percent',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }) :
-                           '∞');
+      (purchaseTotal > 0 ?
+           ((currentTotal / purchaseTotal) - 1).toLocaleString('en', {
+             style: 'percent',
+             minimumFractionDigits: 0,
+             maximumFractionDigits: 2,
+           }) :
+           '∞');
   const usdDeltaString = (currentTotal - purchaseTotal).toLocaleString('en', {
     style: 'currency',
     currency: 'usd',
