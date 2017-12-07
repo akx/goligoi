@@ -11,6 +11,25 @@ td.num {
     text-align: right;
 }
 
+th, td {
+    padding: 2px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+tbody tr:nth-child(2n) {
+    background: #eee;
+}
+
+input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dotted #888;
+    display: block;
+}
+
 body {
     display: flex;
     margin: 0;
@@ -47,4 +66,11 @@ main {
 }
 #result .fiat {
     font-size: 3vw;
+}
+
+#loading {
+    flex: 1;
+    text-align: center;
+    margin: 2em;
+    font-size: 35px;
 }

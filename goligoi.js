@@ -23,34 +23,58 @@ const setter = (table, symbol) => (event) => {
 const numberInput = (props) => (m(
     'input',
     Object.assign({type: 'number', step: 0.00001, min: 0}, props),
-    )
+    ));
 
-);
+const formatUSD = (usd) => usd.toLocaleString('en', {
+  style: 'currency',
+  currency: 'usd',
+});
 
-const coinRow = (coin) => (m('tr', [
-  m('th', coin.symbol),
-  m('th', coin.name),
-  m('td.num', parseFloat(coin.price_usd).toLocaleString('en', {
-    style: 'decimal',
-    minimumFractionDigits: 6,
-    maximumFractionDigits: 6
-  })),
+const formatPercentage = (p, d = 0) =>
+    ((p !== 0 && !isNaN(p)) ? (p + d).toLocaleString('en', {
+      style: 'percent',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }) :
+                              '∞');
 
-  m('td', numberInput({
-      value: state.purchasePrices[coin.symbol],
-      oninput: setter('purchasePrices', coin.symbol)
+const coinRow = (coin) => {
+  const currentPrice = parseFloat(coin.price_usd);
+  const currentHolding = state.holdings[coin.symbol];
+  const currentHoldingValue = currentHolding * currentPrice;
+  const purchaseValue = (state.purchasePrices[coin.symbol] || 0) * currentPrice;
+  return m('tr', [
+    m('th', coin.symbol),
+    m('th', coin.name),
+    m('td.num', currentPrice.toLocaleString('en', {
+      style: 'decimal',
+      minimumFractionDigits: 6,
+      maximumFractionDigits: 6
     })),
-  m('td', numberInput({
-      value: state.holdings[coin.symbol],
-      oninput: setter('holdings', coin.symbol)
-    })),
-]));
+
+    m('td', numberInput({
+        value: state.purchasePrices[coin.symbol],
+        oninput: setter('purchasePrices', coin.symbol)
+      })),
+    m('td',
+      numberInput(
+          {value: currentHolding, oninput: setter('holdings', coin.symbol)})),
+    m('td.num',
+      (currentHolding ? formatPercentage(purchaseValue / currentHoldingValue) :
+                        null)),
+    m('td.num', (currentHolding ? formatUSD(currentHoldingValue) : null)),
+    m('td.num',
+      (currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null)),
+  ]);
+};
 
 const coinTable = () =>
     m('table',
       m('thead',
-        ['Symbol', 'Name', 'USD', 'Avg Purchase Price', 'Current Holding'].map(
-            (caption) => m('th', caption))),
+        [
+          'Symbol', 'Name', 'USD', 'Avg Purch $', 'Current Holding', '%', '$',
+          'Δ$'
+        ].map((caption) => m('th', caption))),
       m('tbody', coins.map((coin) => coinRow(coin))));
 
 const resultDiv = () => {
@@ -65,22 +89,9 @@ const resultDiv = () => {
     }
   });
   if (currentTotal === 0) return;
-  const percentageString =
-      (purchaseTotal > 0 ?
-           ((currentTotal / purchaseTotal) - 1).toLocaleString('en', {
-             style: 'percent',
-             minimumFractionDigits: 0,
-             maximumFractionDigits: 2,
-           }) :
-           '∞');
-  const usdDeltaString = (currentTotal - purchaseTotal).toLocaleString('en', {
-    style: 'currency',
-    currency: 'usd',
-  });
-  const usdString = (currentTotal).toLocaleString('en', {
-    style: 'currency',
-    currency: 'usd',
-  });
+  const percentageString = formatPercentage((currentTotal / purchaseTotal), -1);
+  const usdDeltaString = formatUSD(currentTotal - purchaseTotal);
+  const usdString = formatUSD(currentTotal);
   return m(
       'div.inner',
       m('div.percentage', percentageString),
@@ -90,7 +101,7 @@ const resultDiv = () => {
 };
 
 const view = () => {
-  if (coins === null) return m('div', 'Loading from Coinmarketcap...');
+  if (coins === null) return m('div#loading', 'Loading from Coinmarketcap...');
   return m('main', m('div#table', coinTable()), m('div#result', resultDiv()));
 };
 
