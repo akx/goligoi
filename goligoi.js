@@ -41,8 +41,9 @@ const formatPercentage = (p, d = 0) =>
 const coinRow = (coin) => {
   const currentPrice = parseFloat(coin.price_usd);
   const currentHolding = state.holdings[coin.symbol];
-  const currentHoldingValue = currentHolding * currentPrice;
-  const purchaseValue = (state.purchasePrices[coin.symbol] || 0) * currentPrice;
+  const currentHoldingValue = currentPrice * currentHolding;
+  const purchaseValue =
+      (state.purchasePrices[coin.symbol] || 0) * currentHolding;
   return m('tr', [
     m('th', coin.symbol),
     m('th', coin.name),
@@ -60,8 +61,9 @@ const coinRow = (coin) => {
       numberInput(
           {value: currentHolding, oninput: setter('holdings', coin.symbol)})),
     m('td.num',
-      (currentHolding ? formatPercentage(purchaseValue / currentHoldingValue) :
-                        null)),
+      (currentHolding ?
+           formatPercentage(currentHoldingValue / purchaseValue, -1) :
+           null)),
     m('td.num', (currentHolding ? formatUSD(currentHoldingValue) : null)),
     m('td.num',
       (currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null)),
