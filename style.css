@@ -1,0 +1,50 @@
+* {
+    font-size: 10pt;
+    font-family: sans-serif;
+}
+
+th {
+    text-align: left;
+}
+
+td.num {
+    text-align: right;
+}
+
+body {
+    display: flex;
+    margin: 0;
+    height: 100vh;
+}
+
+main {
+    display: flex;
+    flex: 1;
+}
+
+#table {
+    overflow-y: auto;
+    background: white;
+}
+
+#result {
+    flex: 1;
+    background: firebrick;
+    display: flex;
+    align-content: center;
+    align-items: center;
+}
+
+#result .inner {
+    flex: 1;
+    color: gold;
+    text-align: center;
+}
+
+#result .percentage {
+    font-size: 7vw;
+    margin: 5rem;
+}
+#result .fiat {
+    font-size: 3vw;
+}
