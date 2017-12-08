@@ -74,3 +74,14 @@ main {
     margin: 2em;
     font-size: 35px;
 }
+
+button#reload {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    background: transparent;
+    border: none;
+    color: greenyellow;
+    font-size: 15pt;
+}

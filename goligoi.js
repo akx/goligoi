@@ -1,11 +1,14 @@
 const m = window.m;
 let coins = null;
-fetch('https://api.coinmarketcap.com/v1/ticker/')
-    .then((r) => r.json())
-    .then((j) => {
-      coins = j;
-      m.redraw();
-    });
+
+function getCoins() {
+  fetch('https://api.coinmarketcap.com/v1/ticker/')
+      .then((r) => r.json())
+      .then((j) => {
+        coins = j;
+        m.redraw();
+      });
+}
 
 const state = {
   purchasePrices: {},
@@ -104,7 +107,12 @@ const resultDiv = () => {
 
 const view = () => {
   if (coins === null) return m('div#loading', 'Loading from Coinmarketcap...');
-  return m('main', m('div#table', coinTable()), m('div#result', resultDiv()));
+  return m('main', [
+    m('div#table', coinTable()),
+    m('div#result', resultDiv()),
+    m('button#reload', {onClick: getCoins}, 'Refresh'),
+  ]);
 };
 
 m.mount(document.body, {view});
+getCoins();
