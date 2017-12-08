@@ -110,7 +110,7 @@ const view = () => {
   return m('main', [
     m('div#table', coinTable()),
     m('div#result', resultDiv()),
-    m('button#reload', {onClick: getCoins}, 'Refresh'),
+    m('button#reload', {onclick: () => getCoins()}, 'Refresh'),
   ]);
 };
 
