@@ -1,6 +1,50 @@
 const m = window.m;
 let coins = null;
 
+function drawText(t, e, n, l) {
+  const o = {
+      0: 15214,
+      1: 9370,
+      2: 29347,
+      3: 14499,
+      4: 18925,
+      5: 14543,
+      6: 31694,
+      7: 4775,
+      8: 31727,
+      9: 31215,
+      '.': 8192,
+      '-': 448,
+      k: 22249
+    },
+    c = e;
+  for (let f = 0; f < l.length; f++) {
+    const s = l[f];
+    if (('.' === s && e--, '\n' === s)) (n += 7), (e = c);
+    else {
+      const l = o[s] || 65535;
+      for (let o = 0; 15 > o; o++) l & (1 << o) && t.fillRect(e + o % 3, n + (0 | (o / 3)), 1, 1);
+      e += '1' === s || '.' === s ? 3 : 4;
+    }
+  }
+}
+
+function renderFavicon(num) {
+  const s = (num / 1000).toFixed(2).replace('.', '.\n') + 'k';
+  const canvas = Object.assign(document.createElement('canvas'), { width: 16, height: 16 });
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, 16, 16);
+  ctx.fillStyle = 'gold';
+  drawText(ctx, 2, 2, s);
+  const png = canvas.toDataURL('image/png');
+  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+  link.type = 'image/x-icon';
+  link.rel = 'shortcut icon';
+  link.href = png;
+  document.getElementsByTagName('head')[0].appendChild(link);
+}
+
 function getCoins() {
   fetch('https://api.coinmarketcap.com/v1/ticker/')
     .then(r => r.json())
@@ -92,6 +136,7 @@ const resultDiv = () => {
   const percentageString = formatPercentage(currentTotal / purchaseTotal, -1);
   const usdDeltaString = formatUSD(currentTotal - purchaseTotal);
   const usdString = formatUSD(currentTotal);
+  renderFavicon(currentTotal);
   return m('div.inner', m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString));
 };
 
