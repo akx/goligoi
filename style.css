@@ -85,3 +85,7 @@ button#reload {
     color: greenyellow;
     font-size: 15pt;
 }
+
+button#reload.auto::before {
+    content: "Auto";
+}

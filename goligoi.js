@@ -56,14 +56,21 @@ function getCoins() {
 
 const state = {
   purchasePrices: {},
-  holdings: {}
+  holdings: {},
+  autorefresh: false
 };
 
-Object.assign(state, JSON.parse(localStorage.getItem('goligoi-state') || '{}'));
+function saveState() {
+  localStorage.setItem('goligoi-state', JSON.stringify(state));
+}
+
+function loadState() {
+  Object.assign(state, JSON.parse(localStorage.getItem('goligoi-state') || '{}'));
+}
 
 const setter = (table, symbol) => event => {
   state[table][symbol] = event.target.value === '' ? null : event.target.valueAsNumber;
-  localStorage.setItem('goligoi-state', JSON.stringify(state));
+  saveState();
 };
 
 const numberInput = props => m('input', Object.assign({ type: 'number', step: 0.00001, min: 0 }, props));
@@ -145,9 +152,28 @@ const view = () => {
   return m('main', [
     m('div#table', coinTable()),
     m('div#result', resultDiv()),
-    m('button#reload', { onclick: () => getCoins() }, 'Refresh')
+    m(
+      'button#reload',
+      {
+        onclick: e => {
+          if (e.shiftKey) {
+            state.autorefresh = !state.autorefresh;
+            return;
+          }
+          getCoins();
+        },
+        className: state.autorefresh ? 'auto' : null
+      },
+      'Refresh'
+    )
   ]);
 };
 
+loadState();
 m.mount(document.body, { view });
 getCoins();
+setInterval(() => {
+  if (state.autorefresh) {
+    getCoins();
+  }
+}, 120000);
