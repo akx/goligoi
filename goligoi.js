@@ -60,6 +60,20 @@ const state = {
   autorefresh: false
 };
 
+function calculateTotals() {
+  let purchaseTotal = 0;
+  let currentTotal = 0;
+  (coins || []).forEach(coin => {
+    const purchasePrice = state.purchasePrices[coin.symbol] || 0;
+    const holding = state.holdings[coin.symbol] || null;
+    if (holding) {
+      purchaseTotal += purchasePrice * holding;
+      currentTotal += parseFloat(coin.price_usd) * holding;
+    }
+  });
+  return { currentTotal, purchaseTotal };
+}
+
 function saveState() {
   localStorage.setItem('goligoi-state', JSON.stringify(state));
 }
@@ -128,30 +142,21 @@ const coinTable = () =>
     m('tbody', coins.map(coin => coinRow(coin)))
   );
 
-const resultDiv = () => {
-  let purchaseTotal = 0;
-  let currentTotal = 0;
-  (coins || []).forEach(coin => {
-    const purchasePrice = state.purchasePrices[coin.symbol] || 0;
-    const holding = state.holdings[coin.symbol] || null;
-    if (holding) {
-      purchaseTotal += purchasePrice * holding;
-      currentTotal += parseFloat(coin.price_usd) * holding;
-    }
-  });
+const resultDiv = (totals) => {
+  const { purchaseTotal, currentTotal } = totals;
   if (currentTotal === 0) return;
   const percentageString = formatPercentage(currentTotal / purchaseTotal, -1);
   const usdDeltaString = formatUSD(currentTotal - purchaseTotal);
   const usdString = formatUSD(currentTotal);
-  renderFavicon(currentTotal);
   return m('div.inner', m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString));
 };
 
 const view = () => {
   if (coins === null) return m('div#loading', 'Loading from Coinmarketcap...');
+  const totals = calculateTotals();
   return m('main', [
     m('div#table', coinTable()),
-    m('div#result', resultDiv()),
+    m('div#result', resultDiv(totals)),
     m(
       'button#reload',
       {
