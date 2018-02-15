@@ -46,11 +46,16 @@ function renderFavicon(num) {
 }
 
 function getCoins() {
-  fetch('https://api.coinmarketcap.com/v1/ticker/')
+  return fetch('https://api.coinmarketcap.com/v1/ticker/')
     .then(r => r.json())
     .then(j => {
       coins = j;
       m.redraw();
+    })
+    .then(() => {
+      const totals = calculateTotals(state);
+      renderFavicon(totals.currentTotal);
+      saveTimeSeries(totals);
     });
 }
 
@@ -82,7 +87,16 @@ function loadState() {
   Object.assign(state, JSON.parse(localStorage.getItem('goligoi-state') || '{}'));
 }
 
-const setter = (table, symbol) => event => {
+function saveTimeSeries(values) {
+  const timestamp = Math.round((+new Date()) / 1000);
+  const bucketId = Math.floor(timestamp / 86400).toString(16).padStart(5, '0');
+  const bucketName = `goligoi-ts-${bucketId}`;
+  const bucketArray = JSON.parse(localStorage.getItem(bucketName) || '[]');
+  bucketArray.push({ timestamp, ...values });
+  localStorage.setItem(bucketName, JSON.stringify(bucketArray, null, 0));
+}
+
+const createStateUpdater = (table, symbol) => event => {
   state[table][symbol] = event.target.value === '' ? null : event.target.valueAsNumber;
   saveState();
 };
@@ -128,10 +142,10 @@ const coinRow = coin => {
       'td',
       numberInput({
         value: state.purchasePrices[coin.symbol],
-        oninput: setter('purchasePrices', coin.symbol)
+        oninput: createStateUpdater('purchasePrices', coin.symbol)
       })
     ),
-    m('td', numberInput({ value: currentHolding, oninput: setter('holdings', coin.symbol) })),
+    m('td', numberInput({ value: currentHolding, oninput: createStateUpdater('holdings', coin.symbol) })),
     m('td.num', currentHolding ? formatPercentage(currentHoldingValue / purchaseValue, -1) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null)
