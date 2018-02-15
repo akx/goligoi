@@ -15,7 +15,7 @@ function drawText(t, e, n, l) {
       9: 31215,
       '.': 8192,
       '-': 448,
-      k: 22249
+      k: 22249,
     },
     c = e;
   for (let f = 0; f < l.length; f++) {
@@ -38,7 +38,7 @@ function renderFavicon(num) {
   ctx.fillStyle = 'gold';
   drawText(ctx, 2, 2, s);
   const png = canvas.toDataURL('image/png');
-  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+  const link = document.querySelector('link[rel*=\'icon\']') || document.createElement('link');
   link.type = 'image/x-icon';
   link.rel = 'shortcut icon';
   link.href = png;
@@ -62,7 +62,7 @@ function getCoins() {
 const state = {
   purchasePrices: {},
   holdings: {},
-  autorefresh: false
+  autorefresh: false,
 };
 
 function calculateTotals() {
@@ -88,8 +88,10 @@ function loadState() {
 }
 
 function saveTimeSeries(values) {
-  const timestamp = Math.round((+new Date()) / 1000);
-  const bucketId = Math.floor(timestamp / 86400).toString(16).padStart(5, '0');
+  const timestamp = Math.round(+new Date() / 1000);
+  const bucketId = Math.floor(timestamp / 86400)
+    .toString(16)
+    .padStart(5, '0');
   const bucketName = `goligoi-ts-${bucketId}`;
   const bucketArray = JSON.parse(localStorage.getItem(bucketName) || '[]');
   bucketArray.push({ timestamp, ...values });
@@ -106,16 +108,16 @@ const numberInput = props => m('input', Object.assign({ type: 'number', step: 0.
 const formatUSD = usd =>
   usd.toLocaleString('en', {
     style: 'currency',
-    currency: 'usd'
+    currency: 'usd',
   });
 
 const formatPercentage = (p, d = 0) =>
   p !== 0 && !isNaN(p)
     ? (p + d).toLocaleString('en', {
-        style: 'percent',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      })
+      style: 'percent',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })
     : '∞';
 
 const coinRow = coin => {
@@ -134,7 +136,7 @@ const coinRow = coin => {
       currentPrice.toLocaleString('en', {
         style: 'decimal',
         minimumFractionDigits: 6,
-        maximumFractionDigits: 6
+        maximumFractionDigits: 6,
       })
     ),
 
@@ -142,24 +144,23 @@ const coinRow = coin => {
       'td',
       numberInput({
         value: state.purchasePrices[coin.symbol],
-        oninput: createStateUpdater('purchasePrices', coin.symbol)
+        oninput: createStateUpdater('purchasePrices', coin.symbol),
       })
     ),
     m('td', numberInput({ value: currentHolding, oninput: createStateUpdater('holdings', coin.symbol) })),
     m('td.num', currentHolding ? formatPercentage(currentHoldingValue / purchaseValue, -1) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue) : null),
-    m('td.num', currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null)
+    m('td.num', currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null),
   ]);
 };
 
 const coinTable = () =>
-  m(
-    'table',
+  m('table', [
     m('thead', ['Symbol', 'Name', 'USD', 'Avg Purch $', 'Current Holding', '%', '$', 'Δ$'].map(caption => m('th', caption))),
-    m('tbody', coins.map(coin => coinRow(coin)))
-  );
+    m('tbody', coins.map(coin => coinRow(coin))),
+  ]);
 
-const resultDiv = (totals) => {
+const resultDiv = totals => {
   const { purchaseTotal, currentTotal } = totals;
   if (currentTotal === 0) return;
   const percentageString = formatPercentage(currentTotal / purchaseTotal, -1);
@@ -167,7 +168,6 @@ const resultDiv = (totals) => {
   const usdString = formatUSD(currentTotal);
   return m('div.inner', m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString));
 };
-
 
 function settingses() {
   return [
