@@ -109,6 +109,9 @@ const coinRow = coin => {
   const currentHolding = state.holdings[coin.symbol];
   const currentHoldingValue = currentPrice * currentHolding;
   const purchaseValue = (state.purchasePrices[coin.symbol] || 0) * currentHolding;
+  if (state.hideNonheld && !(Number.isFinite(currentHolding) && currentHolding > 0)) {
+    return null;
+  }
   return m('tr', { key: coin.symbol }, [
     m('th', coin.symbol),
     m('th', coin.name),
@@ -176,6 +179,16 @@ function settingses() {
         },
       }),
       'Autorefresh',
+    ]),
+    m('label', [
+      m('input', {
+        type: 'checkbox',
+        checked: state.hideNonheld,
+        onchange(e) {
+          state.hideNonheld = e.target.checked;
+        },
+      }),
+      'Hide Nonheld Coins',
     ]),
   ];
 }
