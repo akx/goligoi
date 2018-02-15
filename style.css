@@ -11,6 +11,14 @@ td.num {
     text-align: right;
 }
 
+th.symbol {
+    width: 4em;
+}
+
+tbody th {
+    font-weight: normal;
+}
+
 th, td {
     padding: 2px;
 }
@@ -30,6 +38,8 @@ tbody tr:nth-child(2n) {
     border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
     display: block;
     color: #ddd;
+    max-width: 6em;
+    width: 100%;
 }
 
 body {
@@ -42,7 +52,7 @@ body {
 main {
     display: grid;
     height: 100vh;
-    grid-template-columns: auto;
+    grid-template-columns: 2fr 4fr;
     grid-template-rows: 1fr auto;
     grid-template-areas: "coins result" "footer footer";
     align-items: stretch;

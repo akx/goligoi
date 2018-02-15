@@ -129,10 +129,10 @@ const coinRow = coin => {
     return null;
   }
   return m('tr', { key: coin.symbol }, [
-    m('th', coin.symbol),
-    m('th', coin.name),
+    m('th.symbol', coin.symbol),
+    m('th.name', coin.name),
     m(
-      'td.num',
+      'td.num.current-price',
       currentPrice.toLocaleString('en', {
         style: 'decimal',
         minimumFractionDigits: 6,
@@ -141,13 +141,13 @@ const coinRow = coin => {
     ),
 
     m(
-      'td',
+      'td.purchase-price',
       numberInput({
         value: state.purchasePrices[coin.symbol],
         oninput: createStateUpdater('purchasePrices', coin.symbol),
       })
     ),
-    m('td', numberInput({ value: currentHolding, oninput: createStateUpdater('holdings', coin.symbol) })),
+    m('td.holding', numberInput({ value: currentHolding, oninput: createStateUpdater('holdings', coin.symbol) })),
     m('td.num', currentHolding ? formatPercentage(currentHoldingValue / purchaseValue, -1) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null),
@@ -156,7 +156,7 @@ const coinRow = coin => {
 
 const coinTable = () =>
   m('table', [
-    m('thead', ['Symbol', 'Name', 'USD', 'Avg Purch $', 'Current Holding', '%', '$', 'Δ$'].map(caption => m('th', caption))),
+    m('thead', ['Symbol', 'Name', 'USD', 'Avg\u200BPurch\u200B$', 'Holding', '%', '$', 'Δ$'].map(caption => m('th', caption))),
     m('tbody', coins.map(coin => coinRow(coin))),
   ]);
 
