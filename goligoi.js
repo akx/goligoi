@@ -151,12 +151,9 @@ const resultDiv = (totals) => {
   return m('div.inner', m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString));
 };
 
-const view = () => {
-  if (coins === null) return m('div#loading', 'Loading from Coinmarketcap...');
-  const totals = calculateTotals();
-  return m('main', [
-    m('div#table', coinTable()),
-    m('div#result', resultDiv(totals)),
+
+function settingses() {
+  return [
     m(
       'button#reload',
       {
@@ -167,10 +164,29 @@ const view = () => {
           }
           getCoins();
         },
-        className: state.autorefresh ? 'auto' : null
       },
       'Refresh'
-    )
+    ),
+    m('label', [
+      m('input', {
+        type: 'checkbox',
+        checked: state.autorefresh,
+        onchange(e) {
+          state.autorefresh = e.target.checked;
+        },
+      }),
+      'Autorefresh',
+    ]),
+  ];
+}
+
+const view = () => {
+  if (coins === null) return m('div#loading', 'Loading from Coinmarketcap...');
+  const totals = calculateTotals(state);
+  return m('main', [
+    m('div#table', coinTable(state)),
+    m('div#result', resultDiv(totals)),
+    m('div#settings', settingses()),
   ]);
 };
 

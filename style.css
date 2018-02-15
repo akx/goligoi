@@ -1,6 +1,6 @@
 * {
     font-size: 10pt;
-    font-family: sans-serif;
+    font-family: "Roboto Condensed", sans-serif;
 }
 
 th {
@@ -17,38 +17,46 @@ th, td {
 
 table {
     border-collapse: collapse;
+    width: 100%;
 }
 
 tbody tr:nth-child(2n) {
-    background: #eee;
+    background: rgba(0, 0, 0, 0.2);
 }
 
-input {
+#table input {
     background: transparent;
     border: none;
-    border-bottom: 1px dotted #888;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
     display: block;
+    color: #ddd;
 }
 
 body {
-    display: flex;
     margin: 0;
+    background: #262626;
+    color: #ddd;
     height: 100vh;
 }
 
 main {
-    display: flex;
-    flex: 1;
+    display: grid;
+    height: 100vh;
+    grid-template-columns: auto;
+    grid-template-rows: 1fr auto;
+    grid-template-areas: "coins result" "footer footer";
+    align-items: stretch;
 }
 
 #table {
     overflow-y: auto;
-    background: white;
+    grid-area: coins;
+    background:#1B1464;
 }
 
 #result {
-    flex: 1;
-    background: firebrick;
+    grid-area: result;
+    background: #6F1E51;
     display: flex;
     align-content: center;
     align-items: center;
@@ -56,7 +64,7 @@ main {
 
 #result .inner {
     flex: 1;
-    color: gold;
+    color: #FFC312;
     text-align: center;
 }
 
@@ -64,6 +72,7 @@ main {
     font-size: 7vw;
     margin: 5rem;
 }
+
 #result .fiat {
     font-size: 3vw;
 }
@@ -75,15 +84,15 @@ main {
     font-size: 35px;
 }
 
+#settings {
+    grid-area: footer;
+    padding: 0.5em;
+}
+
 button#reload {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    z-index: 100;
     background: transparent;
-    border: none;
-    color: greenyellow;
-    font-size: 15pt;
+    border: 1px solid #C4E538;
+    color: #C4E538;
 }
 
 button#reload.auto::before {
