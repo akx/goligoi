@@ -55,7 +55,10 @@ function getCoins() {
     .then(() => {
       const totals = calculateTotals(state);
       renderFavicon(totals.currentTotal);
-      saveTimeSeries(totals);
+      saveTimeSeries({
+        currentTotal: Math.round(totals.currentTotal || 0),
+        purchaseTotal: Math.round(totals.purchaseTotal || 0),
+      });
     });
 }
 
