@@ -172,6 +172,19 @@ const resultDiv = totals => {
   return m('div.inner', m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString));
 };
 
+function checkbox(label, stateField) {
+  return m('label', [
+    m('input', {
+      type: 'checkbox',
+      checked: state[stateField],
+      onchange(e) {
+        state[stateField] = e.target.checked;
+      },
+    }),
+    label,
+  ]);
+}
+
 function settingses() {
   return [
     m(
@@ -187,26 +200,8 @@ function settingses() {
       },
       'Refresh'
     ),
-    m('label', [
-      m('input', {
-        type: 'checkbox',
-        checked: state.autorefresh,
-        onchange(e) {
-          state.autorefresh = e.target.checked;
-        },
-      }),
-      'Autorefresh',
-    ]),
-    m('label', [
-      m('input', {
-        type: 'checkbox',
-        checked: state.hideNonheld,
-        onchange(e) {
-          state.hideNonheld = e.target.checked;
-        },
-      }),
-      'Hide Nonheld Coins',
-    ]),
+    checkbox('Autorefresh', 'autorefresh'),
+    checkbox('Hide Nonheld Coins', 'hideNonheld'),
   ];
 }
 
