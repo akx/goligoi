@@ -156,14 +156,16 @@ const formatUSD = usd =>
     currency: 'usd',
   });
 
-const formatPercentage = (p, d = 0) =>
-  p !== 0 && !isNaN(p)
-    ? (p + d).toLocaleString('en', {
+const formatPercentage = (p, d = 0) => {
+  if (p !== 0 && !isNaN(p)) {
+    return (p + d).toLocaleString('en', {
       style: 'percent',
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    })
-    : '∞';
+    });
+  }
+  return '∞';
+};
 
 const coinRow = coin => {
   const currentPrice = parseFloat(coin.price_usd);
@@ -184,7 +186,6 @@ const coinRow = coin => {
         maximumFractionDigits: 6,
       })
     ),
-
     m(
       'td.purchase-price',
       numberInput({
@@ -211,7 +212,11 @@ const resultDiv = totals => {
   const percentageString = formatPercentage(currentTotal / purchaseTotal, -1);
   const usdDeltaString = formatUSD(currentTotal - purchaseTotal);
   const usdString = formatUSD(currentTotal);
-  return m('div.inner', m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString));
+  return m('div.inner', [
+    m('div.percentage', percentageString),
+    m('div.fiat', usdString),
+    m('div.fiat', 'Δ ' + usdDeltaString),
+  ]);
 };
 
 function checkbox(label, stateField) {
