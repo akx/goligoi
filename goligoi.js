@@ -66,6 +66,7 @@ const state = {
   purchasePrices: {},
   holdings: {},
   autorefresh: false,
+  showChart: true,
 };
 
 function calculateTotals() {
@@ -285,6 +286,7 @@ function settingses() {
     ),
     checkbox('Autorefresh', 'autorefresh'),
     checkbox('Hide Nonheld Coins', 'hideNonheld'),
+    checkbox('Show Chart', 'showChart'),
   ];
 }
 
@@ -294,7 +296,7 @@ const view = () => {
   return m('main', [
     m('div#table', coinTable(state)),
     m('div#result', {
-      style: `background-image: url(${generateTimeSeriesSVG()}`,
+      style: (state.showChart ? `background-image: url(${generateTimeSeriesSVG()}` : ''),
     }, resultDiv(totals)),
     m('div#settings', settingses()),
   ]);
