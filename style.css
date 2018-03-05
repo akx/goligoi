@@ -67,7 +67,8 @@ main {
 #result {
     grid-area: result;
     background: #6F1E51;
-    background-size: cover;
+    background-size: 100% 70%;
+    background-origin: border-box;
     background-position: center center;
     background-repeat: no-repeat;
     display: flex;
