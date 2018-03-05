@@ -54,14 +54,23 @@ main {
     height: 100vh;
     grid-template-columns: 2fr 4fr;
     grid-template-rows: 1fr auto;
-    grid-template-areas: "coins result" "footer footer";
+    grid-template-areas: "result result" "footer footer";
     align-items: stretch;
+}
+
+main.sidebar-visible {
+    grid-template-areas: "coins result" "footer footer";
 }
 
 #table {
     overflow-y: auto;
     grid-area: coins;
+    display: none;
     background:#1B1464;
+}
+
+main.sidebar-visible #table {
+    display: block;
 }
 
 #result {

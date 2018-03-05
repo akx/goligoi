@@ -67,6 +67,7 @@ const state = {
   holdings: {},
   autorefresh: false,
   showChart: true,
+  showSidebar: true,
 };
 
 function calculateTotals() {
@@ -289,13 +290,14 @@ function settingses() {
     checkbox('Autorefresh', 'autorefresh'),
     checkbox('Hide Nonheld Coins', 'hideNonheld'),
     checkbox('Show Chart', 'showChart'),
+    checkbox('Show Sidebar', 'showSidebar'),
   ];
 }
 
 const view = () => {
   if (coins === null) return m('div#loading', 'Loading from Coinmarketcap...');
   const totals = calculateTotals(state);
-  return m('main', [
+  return m('main' + (state.showSidebar ? '.sidebar-visible' : ''), [
     m('div#table', coinTable(state)),
     m('div#result', {
       style: (state.showChart ? `background-image: url(${generateTimeSeriesSVG()}` : ''),
