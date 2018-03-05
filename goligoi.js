@@ -55,7 +55,7 @@ function getCoins() {
     .then(() => {
       const totals = calculateTotals(state);
       renderFavicon(totals.currentTotal);
-      saveTimeSeries({
+      saveTimeSeriesValues({
         currentTotal: Math.round(totals.currentTotal || 0),
         purchaseTotal: Math.round(totals.purchaseTotal || 0),
       });
@@ -90,15 +90,46 @@ function loadState() {
   Object.assign(state, JSON.parse(localStorage.getItem('goligoi-state') || '{}'));
 }
 
-function saveTimeSeries(values) {
+
+function aop(arr) {
+  const keys = {};
+  let nKeys = 0;
+  const out = arr.map((obj) => {
+    const outObj = {};
+    Object.keys(obj).forEach((key) => {
+      if (!keys[key]) keys[key] = ++nKeys;
+      outObj[keys[key]] = obj[key];
+    });
+    return outObj;
+  });
+  return { $aop: keys, $data: out };
+}
+
+function deaop(aoped) {
+  if (!aoped.$aop) return aoped;
+  const keys = {};
+  Object.keys(aoped.$aop).forEach((key) => {
+    keys[aoped.$aop] = key;
+  });
+  return aoped.$data.map((obj) => {
+    const outObj = {};
+    Object.keys(obj).forEach((key) => {
+      outObj[keys[key]] = obj[key];
+    });
+    return outObj;
+  });
+}
+
+
+function saveTimeSeriesValues(values) {
   const timestamp = Math.round(+new Date() / 1000);
   const bucketId = Math.floor(timestamp / 86400)
     .toString(16)
     .padStart(5, '0');
   const bucketName = `goligoi-ts-${bucketId}`;
-  const bucketArray = JSON.parse(localStorage.getItem(bucketName) || '[]');
+  const bucketArray = deaop(JSON.parse(localStorage.getItem(bucketName) || '[]'));
   bucketArray.push({ timestamp, ...values });
-  localStorage.setItem(bucketName, JSON.stringify(bucketArray, null, 0));
+  localStorage.setItem(bucketName, JSON.stringify(aop(bucketArray), null, 0));
 }
 
 const createStateUpdater = (table, symbol) => event => {
