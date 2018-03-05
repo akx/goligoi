@@ -132,6 +132,17 @@ function saveTimeSeriesValues(values) {
   localStorage.setItem(bucketName, JSON.stringify(aop(bucketArray), null, 0));
 }
 
+function loadTimeSeriesData() {
+  let items = [];
+  for (var key in localStorage) {
+    if (/^goligoi-ts-.+/.test(key)) {
+      items = items.concat(deaop(JSON.parse(localStorage[key])));
+    }
+  }
+  items.sort((a, b) => (a.timestamp - b.timestamp));
+  return items;
+}
+
 const createStateUpdater = (table, symbol) => event => {
   state[table][symbol] = event.target.value === '' ? null : event.target.valueAsNumber;
   saveState();
