@@ -139,8 +139,44 @@ function loadTimeSeriesData() {
       items = items.concat(deaop(JSON.parse(localStorage[key])));
     }
   }
+  items = items.filter(e => e.timestamp);
   items.sort((a, b) => (a.timestamp - b.timestamp));
   return items;
+}
+
+function generateTimeSeriesSVG() {
+  const allData = loadTimeSeriesData();
+  const data = allData.slice(allData.length - 1000);
+  let minTimestamp = data[0].timestamp, maxTimestamp = data[0].timestamp;
+  let minValue = data[0].currentTotal, maxValue = data[0].currentTotal;
+  data.forEach(({ timestamp, currentTotal }) => {
+    if (!isNaN(currentTotal)) {
+      minValue = Math.min(minValue, currentTotal);
+      maxValue = Math.max(maxValue, currentTotal);
+    }
+    if (!isNaN(timestamp)) {
+      minTimestamp = Math.min(minTimestamp, timestamp);
+      maxTimestamp = Math.max(maxTimestamp, timestamp);
+    }
+  });
+  const points = data.map(({ timestamp, currentTotal }) => {
+    if (isNaN(timestamp) || isNaN((currentTotal))) return null;
+    const x = (timestamp - minTimestamp) / (maxTimestamp - minTimestamp) * 1000;
+    const y = (currentTotal - minValue) / (maxValue - minValue) * 700;
+    return { x, y };
+  }).filter(v => v);
+  const svg = m('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: '0 0 1000 700',
+  }, m('polyline', {
+    stroke: 'white',
+    fill: 'none',
+    opacity: '0.4',
+    points: points.map(({ x, y }) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' '),
+  }));
+  const frag = document.createDocumentFragment();
+  m.render(frag, svg);
+  return 'data:image/svg+xml,' + encodeURIComponent('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' + frag.firstChild.outerHTML);
 }
 
 const createStateUpdater = (table, symbol) => event => {
@@ -257,7 +293,9 @@ const view = () => {
   const totals = calculateTotals(state);
   return m('main', [
     m('div#table', coinTable(state)),
-    m('div#result', resultDiv(totals)),
+    m('div#result', {
+      style: `background-image: url(${generateTimeSeriesSVG()}`,
+    }, resultDiv(totals)),
     m('div#settings', settingses()),
   ]);
 };
