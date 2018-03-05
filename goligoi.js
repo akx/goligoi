@@ -129,7 +129,7 @@ function saveTimeSeriesValues(values) {
     .padStart(5, '0');
   const bucketName = `goligoi-ts-${bucketId}`;
   const bucketArray = deaop(JSON.parse(localStorage.getItem(bucketName) || '[]'));
-  bucketArray.push({ timestamp, ...values });
+  bucketArray.push(Object.assign({ timestamp }, values));
   localStorage.setItem(bucketName, JSON.stringify(aop(bucketArray), null, 0));
 }
 
@@ -148,6 +148,7 @@ function loadTimeSeriesData() {
 function generateTimeSeriesSVG() {
   const allData = loadTimeSeriesData();
   const data = allData.slice(allData.length - 1000);
+  if (!data.length) return null;
   let minTimestamp = data[0].timestamp, maxTimestamp = data[0].timestamp;
   let minValue = data[0].currentTotal, maxValue = data[0].currentTotal;
   data.forEach(({ timestamp, currentTotal }) => {
