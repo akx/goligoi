@@ -162,12 +162,12 @@ function generateTimeSeriesSVG() {
   const points = data.map(({ timestamp, currentTotal }) => {
     if (isNaN(timestamp) || isNaN((currentTotal))) return null;
     const x = (timestamp - minTimestamp) / (maxTimestamp - minTimestamp) * 1000;
-    const y = (currentTotal - minValue) / (maxValue - minValue) * 700;
+    const y = (currentTotal - minValue) / (maxValue - minValue) * 1000;
     return { x, y };
   }).filter(v => v);
   const svg = m('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
-    viewBox: '0 0 1000 700',
+    viewBox: '0 0 1000 1000',
   }, m('polyline', {
     stroke: 'white',
     fill: 'none',
