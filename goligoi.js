@@ -96,13 +96,17 @@ function loadState() {
 function aop(arr) {
   const keys = {};
   let nKeys = 0;
-  const out = arr.map((obj) => {
+  const out = [];
+  arr.forEach((obj) => {
     const outObj = {};
     Object.keys(obj).forEach((key) => {
+      if(key === 'undefined') return;
       if (!keys[key]) keys[key] = ++nKeys;
       outObj[keys[key]] = obj[key];
     });
-    return outObj;
+    if(Object.keys(outObj).length) {
+      out.push(outObj);
+    }
   });
   return { $aop: keys, $data: out };
 }
@@ -111,7 +115,7 @@ function deaop(aoped) {
   if (!aoped.$aop) return aoped;
   const keys = {};
   Object.keys(aoped.$aop).forEach((key) => {
-    keys[aoped.$aop] = key;
+    keys[aoped.$aop[key]] = key;
   });
   return aoped.$data.map((obj) => {
     const outObj = {};
@@ -119,7 +123,7 @@ function deaop(aoped) {
       outObj[keys[key]] = obj[key];
     });
     return outObj;
-  });
+  }).filter(obj => (('' + obj) !== '{}'));
 }
 
 
@@ -129,9 +133,12 @@ function saveTimeSeriesValues(values) {
     .toString(16)
     .padStart(5, '0');
   const bucketName = `goligoi-ts-${bucketId}`;
-  const bucketArray = deaop(JSON.parse(localStorage.getItem(bucketName) || '[]'));
-  bucketArray.push(Object.assign({ timestamp }, values));
-  localStorage.setItem(bucketName, JSON.stringify(aop(bucketArray), null, 0));
+  const storageValue = JSON.parse(localStorage.getItem(bucketName) || '[]');
+  const bucketArray = deaop(storageValue);
+  const newDatum = Object.assign({ timestamp }, values);
+  bucketArray.push(newDatum);
+  const compressedArray = aop(bucketArray);
+  localStorage.setItem(bucketName, JSON.stringify(compressedArray, null, 0));
 }
 
 function loadTimeSeriesData() {
