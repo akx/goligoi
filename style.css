@@ -80,6 +80,10 @@ main.sidebar-visible {
     background:#1B1464;
 }
 
+#table a {
+    color: inherit;
+}
+
 main.sidebar-visible #table {
     display: block;
 }

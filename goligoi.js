@@ -223,7 +223,7 @@ const coinRow = coin => {
     return null;
   }
   return m('tr', { key: coin.symbol }, [
-    m('th.symbol', coin.symbol),
+    m('th.symbol', m('a', {href: `http://coinmarketcap.com/currencies/${coin.id}`}, coin.symbol)),
     m('th.name', coin.name),
     m(
       'td.num.current-price',
