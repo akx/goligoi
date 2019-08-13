@@ -138,7 +138,32 @@ function saveTimeSeriesValues(values) {
   const newDatum = Object.assign({ timestamp }, values);
   bucketArray.push(newDatum);
   const compressedArray = aop(bucketArray);
-  localStorage.setItem(bucketName, JSON.stringify(compressedArray, null, 0));
+  try {
+    localStorage.setItem(bucketName, JSON.stringify(compressedArray, null, 0));
+  } catch (err) {
+    console.warn('Time series data error:', err);
+    if (err.toString().indexOf('quota') > -1) {
+      cleanTimeSeriesData(1);
+    }
+  }
+}
+
+function cleanTimeSeriesData(limit = 0) {
+  let keys = [];
+  for (var key in localStorage) {
+    if (/^goligoi-ts-.+/.test(key)) {
+      keys.push(key);
+    }
+  }
+  keys.sort();
+  for (var i = 0; i < limit; i++) {
+    if (!keys.length) {
+      break;
+    }
+    var key = keys.shift();
+    localStorage.removeItem(key);
+    console.log('Removed time storage key ' + key);
+  }
 }
 
 function loadTimeSeriesData() {
@@ -248,7 +273,13 @@ const coinRow = coin => {
         oninput: createStateUpdater('purchasePrices', coin.symbol),
       })
     ),
-    m('td.holding', numberInput({ value: currentHolding, oninput: createStateUpdater('holdings', coin.symbol) })),
+    m(
+      'td.holding',
+      numberInput({
+        value: currentHolding,
+        oninput: createStateUpdater('holdings', coin.symbol),
+      })
+    ),
     m('td.num', currentHolding ? formatPercentage(currentHoldingValue / purchaseValue, -1) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue) : null),
     m('td.num', currentHolding ? formatUSD(currentHoldingValue - purchaseValue) : null),
