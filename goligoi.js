@@ -23,7 +23,7 @@ function drawText(t, e, n, l) {
     if (('.' === s && e--, '\n' === s)) (n += 7), (e = c);
     else {
       const l = o[s] || 65535;
-      for (let o = 0; 15 > o; o++) l & (1 << o) && t.fillRect(e + o % 3, n + (0 | (o / 3)), 1, 1);
+      for (let o = 0; 15 > o; o++) l & (1 << o) && t.fillRect(e + (o % 3), n + (0 | (o / 3)), 1, 1);
       e += '1' === s || '.' === s ? 3 : 4;
     }
   }
@@ -38,7 +38,7 @@ function renderFavicon(num) {
   ctx.fillStyle = 'gold';
   drawText(ctx, 2, 2, s);
   const png = canvas.toDataURL('image/png');
-  const link = document.querySelector('link[rel*=\'icon\']') || document.createElement('link');
+  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
   link.type = 'image/x-icon';
   link.rel = 'shortcut icon';
   link.href = png;
@@ -92,19 +92,18 @@ function loadState() {
   Object.assign(state, JSON.parse(localStorage.getItem('goligoi-state') || '{}'));
 }
 
-
 function aop(arr) {
   const keys = {};
   let nKeys = 0;
   const out = [];
-  arr.forEach((obj) => {
+  arr.forEach(obj => {
     const outObj = {};
-    Object.keys(obj).forEach((key) => {
-      if(key === 'undefined') return;
+    Object.keys(obj).forEach(key => {
+      if (key === 'undefined') return;
       if (!keys[key]) keys[key] = ++nKeys;
       outObj[keys[key]] = obj[key];
     });
-    if(Object.keys(outObj).length) {
+    if (Object.keys(outObj).length) {
       out.push(outObj);
     }
   });
@@ -114,18 +113,19 @@ function aop(arr) {
 function deaop(aoped) {
   if (!aoped.$aop) return aoped;
   const keys = {};
-  Object.keys(aoped.$aop).forEach((key) => {
+  Object.keys(aoped.$aop).forEach(key => {
     keys[aoped.$aop[key]] = key;
   });
-  return aoped.$data.map((obj) => {
-    const outObj = {};
-    Object.keys(obj).forEach((key) => {
-      outObj[keys[key]] = obj[key];
-    });
-    return outObj;
-  }).filter(obj => (('' + obj) !== '{}'));
+  return aoped.$data
+    .map(obj => {
+      const outObj = {};
+      Object.keys(obj).forEach(key => {
+        outObj[keys[key]] = obj[key];
+      });
+      return outObj;
+    })
+    .filter(obj => '' + obj !== '{}');
 }
-
 
 function saveTimeSeriesValues(values) {
   const timestamp = Math.round(+new Date() / 1000);
@@ -149,7 +149,7 @@ function loadTimeSeriesData() {
     }
   }
   items = items.filter(e => e.timestamp);
-  items.sort((a, b) => (a.timestamp - b.timestamp));
+  items.sort((a, b) => a.timestamp - b.timestamp);
   return items;
 }
 
@@ -157,8 +157,10 @@ function generateTimeSeriesSVG() {
   const allData = loadTimeSeriesData();
   const data = allData.slice(allData.length - 1000);
   if (!data.length) return null;
-  let minTimestamp = data[0].timestamp, maxTimestamp = data[0].timestamp;
-  let minValue = data[0].currentTotal, maxValue = data[0].currentTotal;
+  let minTimestamp = data[0].timestamp,
+    maxTimestamp = data[0].timestamp;
+  let minValue = data[0].currentTotal,
+    maxValue = data[0].currentTotal;
   data.forEach(({ timestamp, currentTotal }) => {
     if (!isNaN(currentTotal)) {
       minValue = Math.min(minValue, currentTotal);
@@ -169,22 +171,28 @@ function generateTimeSeriesSVG() {
       maxTimestamp = Math.max(maxTimestamp, timestamp);
     }
   });
-  const points = data.map(({ timestamp, currentTotal }) => {
-    if (isNaN(timestamp) || isNaN((currentTotal))) return null;
-    const x = (timestamp - minTimestamp) / (maxTimestamp - minTimestamp) * 1000;
-    const y = (1 - ((currentTotal - minValue) / (maxValue - minValue))) * 1000;
-    return { x, y };
-  }).filter(v => v);
-  const svg = m('svg', {
-    xmlns: 'http://www.w3.org/2000/svg',
-    width: '1000',
-    height: '1000',
-  }, m('polyline', {
-    stroke: 'white',
-    fill: 'none',
-    opacity: '0.4',
-    points: points.map(({ x, y }) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' '),
-  }));
+  const points = data
+    .map(({ timestamp, currentTotal }) => {
+      if (isNaN(timestamp) || isNaN(currentTotal)) return null;
+      const x = ((timestamp - minTimestamp) / (maxTimestamp - minTimestamp)) * 1000;
+      const y = (1 - (currentTotal - minValue) / (maxValue - minValue)) * 1000;
+      return { x, y };
+    })
+    .filter(v => v);
+  const svg = m(
+    'svg',
+    {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: '1000',
+      height: '1000',
+    },
+    m('polyline', {
+      stroke: 'white',
+      fill: 'none',
+      opacity: '0.4',
+      points: points.map(({ x, y }) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' '),
+    })
+  );
   const frag = document.createDocumentFragment();
   m.render(frag, svg);
   return 'data:image/svg+xml,' + encodeURIComponent('<?xml version="1.0" encoding="UTF-8" standalone="no"?>' + frag.firstChild.outerHTML);
@@ -223,7 +231,7 @@ const coinRow = coin => {
     return null;
   }
   return m('tr', { key: coin.symbol }, [
-    m('th.symbol', m('a', {href: `http://coinmarketcap.com/currencies/${coin.id}`}, coin.symbol)),
+    m('th.symbol', m('a', { href: `http://coinmarketcap.com/currencies/${coin.id}` }, coin.symbol)),
     m('th.name', coin.name),
     m(
       'td.num.current-price',
@@ -259,11 +267,7 @@ const resultDiv = totals => {
   const percentageString = formatPercentage(currentTotal / purchaseTotal, -1);
   const usdDeltaString = formatUSD(currentTotal - purchaseTotal);
   const usdString = formatUSD(currentTotal);
-  return m('div.inner', [
-    m('div.percentage', percentageString),
-    m('div.fiat', usdString),
-    m('div.fiat', 'Δ ' + usdDeltaString),
-  ]);
+  return m('div.inner', [m('div.percentage', percentageString), m('div.fiat', usdString), m('div.fiat', 'Δ ' + usdDeltaString)]);
 };
 
 function checkbox(label, stateField) {
@@ -306,9 +310,13 @@ const view = () => {
   const totals = calculateTotals(state);
   return m('main' + (state.showSidebar ? '.sidebar-visible' : ''), [
     m('div#table', coinTable(state)),
-    m('div#result', {
-      style: (state.showChart ? `background-image: url(${generateTimeSeriesSVG()}` : ''),
-    }, resultDiv(totals)),
+    m(
+      'div#result',
+      {
+        style: state.showChart ? `background-image: url(${generateTimeSeriesSVG()}` : '',
+      },
+      resultDiv(totals)
+    ),
     m('div#settings', settingses()),
   ]);
 };
